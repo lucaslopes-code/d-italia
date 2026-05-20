@@ -4,8 +4,8 @@ import { restaurant } from "@/lib/menu";
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-pomodoro/20 bg-cream-2 text-ink/80">
-      <div className="mx-auto grid items-start gap-8 px-4 py-12 md:grid-cols-3 md:px-8 max-w-7xl">
-        <div>
+      <div className="mx-auto grid items-start gap-8 px-4 py-12 text-center md:grid-cols-3 md:px-8 md:text-left max-w-7xl">
+        <div className="flex flex-col items-center md:items-start">
           <Image
             src="/logo.png"
             alt={restaurant.name}

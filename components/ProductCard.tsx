@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { formatPrice, type Product } from "@/lib/menu";
 import { useCart } from "@/lib/cart";
 
@@ -15,12 +16,23 @@ export function ProductCard({ product }: { product: Product }) {
     <button
       type="button"
       onClick={handleAdd}
-      className="group flex w-full flex-row-reverse items-stretch gap-5 rounded-2xl border border-ink/10 bg-white/70 p-5 text-left backdrop-blur-sm transition-all hover:border-pomodoro/40 hover:bg-white hover:shadow-[0_8px_30px_-10px_rgba(113,16,10,0.25)] active:scale-[0.99] md:p-6"
+      className="group flex w-full flex-row-reverse items-stretch gap-5 rounded-2xl border border-ink/10 bg-[#E2D3B5] p-5 text-left transition-all hover:border-pomodoro/40 hover:bg-[#ece0c8] hover:shadow-[0_8px_30px_-10px_rgba(113,16,10,0.25)] active:scale-[0.99] md:p-6"
     >
       <div className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-cream-2 to-cream md:h-32 md:w-32">
-        <span className="font-display text-4xl text-pomodoro/30 md:text-5xl">
-          ◍
-        </span>
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="(min-width: 768px) 256px, 192px"
+            quality={100}
+            className="object-cover"
+          />
+        ) : (
+          <span className="font-display text-4xl text-pomodoro/30 md:text-5xl">
+            ◍
+          </span>
+        )}
         {product.badge && (
           <span className="absolute top-1.5 left-1.5 rounded-full bg-pomodoro px-2 py-0.5 text-[10px] font-medium tracking-wide text-cream uppercase">
             {product.badge}
