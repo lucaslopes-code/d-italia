@@ -1,18 +1,24 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
-import { formatPrice, restaurant } from "@/lib/menu";
+import { formatPrice, menu, restaurant } from "@/lib/menu";
 
 export function CartSheet() {
-  const { items, isOpen, close, total, updateQuantity, removeItem } = useCart();
+  const { items, isOpen, close, total, updateQuantity, removeItem, addItem } =
+    useCart();
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
+  const [showDrinks, setShowDrinks] = useState(false);
+
+  const drinks = menu.find((c) => c.id === "bevande")?.products ?? [];
 
   // Lock body scroll while open
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.body.style.overflow = isOpen ? "hidden" : "";
+    if (!isOpen) setShowDrinks(false);
     return () => {
       document.body.style.overflow = "";
     };
@@ -110,7 +116,7 @@ export function CartSheet() {
               <button
                 type="button"
                 onClick={close}
-                className="mt-5 rounded-full border border-ink/15 bg-white/70 px-4 py-2 text-sm text-ink hover:bg-white"
+                className="mt-5 rounded-full border border-ink/15 bg-[#E2D3B5] px-4 py-2 text-sm text-ink hover:bg-[#ece0c8]"
               >
                 Ver cardápio
               </button>
@@ -121,7 +127,7 @@ export function CartSheet() {
                 {items.map((item) => (
                   <li
                     key={item.id}
-                    className="rounded-xl border border-ink/10 bg-white/80 p-3"
+                    className="rounded-xl border border-ink/10 bg-[#E2D3B5] p-3"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -180,25 +186,102 @@ export function CartSheet() {
                 ))}
               </ul>
 
-              <button
-                type="button"
-                onClick={close}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-pomodoro px-5 py-3.5 text-sm font-semibold tracking-wide text-cream shadow-[0_4px_18px_-4px_rgba(113,16,10,0.45)] transition-colors hover:bg-pomodoro-dark"
-              >
-                <svg
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                >
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                Adicionar mais itens ao carrinho
-              </button>
+              {showDrinks ? (
+                <div className="mt-5 rounded-xl border border-ink/10 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="font-display text-lg font-semibold text-ink">
+                      Escolha sua bebida
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowDrinks(false)}
+                      className="text-xs tracking-wide text-ink/50 transition-colors hover:text-pomodoro"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                  <ul className="mt-3 space-y-2">
+                    {drinks.map((drink) => (
+                      <li key={drink.id}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            addItem(drink);
+                            setShowDrinks(false);
+                          }}
+                          className="flex w-full items-center gap-3 rounded-lg border border-ink/10 bg-[#E2D3B5] p-2 text-left transition-colors hover:border-pomodoro/50"
+                        >
+                          <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-cream">
+                            {drink.image && (
+                              <Image
+                                src={drink.image}
+                                alt={drink.name}
+                                fill
+                                sizes="48px"
+                                className="object-cover"
+                              />
+                            )}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-sm font-medium text-ink">
+                              {drink.name}
+                            </span>
+                            <span className="block text-xs text-ink/60">
+                              {formatPrice(drink.price)}
+                            </span>
+                          </span>
+                          <span
+                            className="font-display text-xl text-pomodoro"
+                            aria-hidden
+                          >
+                            +
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={close}
+                    className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-pomodoro px-5 py-3.5 text-sm font-semibold tracking-wide text-cream shadow-[0_4px_18px_-4px_rgba(113,16,10,0.45)] transition-colors hover:bg-pomodoro-dark"
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    >
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                    Adicionar mais itens ao carrinho
+                  </button>
 
-              <div className="mt-6 space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowDrinks(true)}
+                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-pomodoro/40 px-5 py-3 text-sm font-semibold tracking-wide text-pomodoro transition-colors hover:bg-pomodoro/5"
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M6 3h12l-1.3 8a5 5 0 0 1-9.4 0L6 3z" />
+                      <path d="M12 16v5M8.5 21h7" />
+                    </svg>
+                    Adicionar bebidas
+                  </button>
+
+                  <div className="mt-6 space-y-3">
                 <div>
                   <label
                     className="text-[11px] font-medium tracking-[0.15em] text-ink/70 uppercase"
@@ -211,7 +294,7 @@ export function CartSheet() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Como devemos te chamar?"
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-white/80 px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-pomodoro"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#E2D3B5] px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-pomodoro"
                   />
                 </div>
                 <div>
@@ -227,10 +310,12 @@ export function CartSheet() {
                     onChange={(e) => setAddress(e.target.value)}
                     rows={2}
                     placeholder="Rua, número, complemento, ponto de referência…"
-                    className="mt-1 w-full resize-none rounded-lg border border-ink/15 bg-white/80 px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-pomodoro"
+                    className="mt-1 w-full resize-none rounded-lg border border-ink/15 bg-[#E2D3B5] px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-pomodoro"
                   />
                 </div>
               </div>
+                </>
+              )}
             </>
           )}
         </div>

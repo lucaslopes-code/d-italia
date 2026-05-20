@@ -9,7 +9,7 @@ export function CartButton() {
   return (
     <button
       onClick={open}
-      className="relative inline-flex items-center gap-2 rounded-full border border-ink/15 bg-white/70 px-3 py-2 text-sm text-ink transition-colors hover:bg-white"
+      className="relative inline-flex items-center gap-2 rounded-full border border-ink/15 bg-[#E2D3B5] px-3 py-2 text-sm text-ink transition-colors hover:bg-[#ece0c8]"
       aria-label="Abrir carrinho de pedido"
     >
       <svg

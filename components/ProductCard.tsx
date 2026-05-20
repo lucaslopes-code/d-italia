@@ -16,7 +16,7 @@ export function ProductCard({ product }: { product: Product }) {
     <button
       type="button"
       onClick={handleAdd}
-      className="group flex w-full flex-row-reverse items-stretch gap-5 rounded-2xl border border-ink/10 bg-[#E2D3B5] p-5 text-left transition-all hover:border-pomodoro/40 hover:bg-[#ece0c8] hover:shadow-[0_8px_30px_-10px_rgba(113,16,10,0.25)] active:scale-[0.99] md:p-6"
+      className="group flex w-full flex-row-reverse items-stretch gap-5 rounded-2xl border border-ink/10 bg-[#E2D3B5] p-5 text-left transition-all hover:border-pomodoro/50 active:scale-[0.99] md:p-6"
     >
       <div className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-cream-2 to-cream md:h-32 md:w-32">
         {product.image ? (
