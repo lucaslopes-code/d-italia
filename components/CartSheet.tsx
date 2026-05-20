@@ -11,6 +11,8 @@ export function CartSheet() {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [showDrinks, setShowDrinks] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errorOpen, setErrorOpen] = useState(false);
 
   const drinks = menu.find((c) => c.id === "bevande")?.products ?? [];
 
@@ -18,7 +20,11 @@ export function CartSheet() {
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.body.style.overflow = isOpen ? "hidden" : "";
-    if (!isOpen) setShowDrinks(false);
+    if (!isOpen) {
+      setShowDrinks(false);
+      setErrorOpen(false);
+      setSubmitted(false);
+    }
     return () => {
       document.body.style.overflow = "";
     };
@@ -37,6 +43,13 @@ export function CartSheet() {
   function handleFinalize() {
     if (items.length === 0) return;
 
+    if (!name.trim() || !address.trim()) {
+      setSubmitted(true);
+      setShowDrinks(false);
+      setErrorOpen(true);
+      return;
+    }
+
     const lines = items.map(
       (i) =>
         `• ${i.quantity}x ${i.name} — ${formatPrice(i.price * i.quantity)}`,
@@ -50,8 +63,8 @@ export function CartSheet() {
       `*Total: ${formatPrice(total)}*`,
     ];
 
-    if (name.trim()) parts.push("", `*Nome:* ${name.trim()}`);
-    if (address.trim()) parts.push(`*Endereço/Obs.:* ${address.trim()}`);
+    parts.push("", `*Nome:* ${name.trim()}`);
+    parts.push(`*Endereço/Obs.:* ${address.trim()}`);
 
     const url = `https://wa.me/${restaurant.whatsapp}?text=${encodeURIComponent(parts.join("\n"))}`;
     window.open(url, "_blank", "noopener");
@@ -287,22 +300,32 @@ export function CartSheet() {
                     className="text-[11px] font-medium tracking-[0.15em] text-ink/70 uppercase"
                     htmlFor="cart-name"
                   >
-                    Nome (opcional)
+                    Nome <span className="text-pomodoro">*</span>
                   </label>
                   <input
                     id="cart-name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Como devemos te chamar?"
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#E2D3B5] px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-pomodoro"
+                    aria-invalid={submitted && !name.trim()}
+                    className={`mt-1 w-full rounded-lg border bg-[#E2D3B5] px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-pomodoro ${
+                      submitted && !name.trim()
+                        ? "border-red-500"
+                        : "border-ink/15"
+                    }`}
                   />
+                  {submitted && !name.trim() && (
+                    <p className="mt-1 text-xs text-red-600">
+                      Informe seu nome.
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label
                     className="text-[11px] font-medium tracking-[0.15em] text-ink/70 uppercase"
                     htmlFor="cart-address"
                   >
-                    Endereço / observações
+                    Endereço / observações <span className="text-pomodoro">*</span>
                   </label>
                   <textarea
                     id="cart-address"
@@ -310,8 +333,18 @@ export function CartSheet() {
                     onChange={(e) => setAddress(e.target.value)}
                     rows={2}
                     placeholder="Rua, número, complemento, ponto de referência…"
-                    className="mt-1 w-full resize-none rounded-lg border border-ink/15 bg-[#E2D3B5] px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-pomodoro"
+                    aria-invalid={submitted && !address.trim()}
+                    className={`mt-1 w-full resize-none rounded-lg border bg-[#E2D3B5] px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-pomodoro ${
+                      submitted && !address.trim()
+                        ? "border-red-500"
+                        : "border-ink/15"
+                    }`}
                   />
+                  {submitted && !address.trim() && (
+                    <p className="mt-1 text-xs text-red-600">
+                      Informe o endereço para entrega.
+                    </p>
+                  )}
                 </div>
               </div>
                 </>
@@ -348,6 +381,51 @@ export function CartSheet() {
           </footer>
         )}
       </aside>
+
+      {errorOpen && (
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-label="Campos obrigatórios"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+        >
+          <div
+            onClick={() => setErrorOpen(false)}
+            aria-hidden
+            className="absolute inset-0 bg-ink/50 backdrop-blur-sm"
+          />
+          <div className="relative w-full max-w-xs rounded-2xl border border-ink/10 bg-cream p-6 text-center shadow-2xl">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-pomodoro/10 text-pomodoro">
+              <svg
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                <path d="M12 9v4M12 17h.01" />
+              </svg>
+            </div>
+            <h3 className="mt-4 font-display text-xl font-semibold text-ink">
+              Faltou preencher
+            </h3>
+            <p className="mt-1 text-sm text-ink/70">
+              Informe seu <strong>nome</strong> e <strong>endereço</strong> para
+              finalizar o pedido.
+            </p>
+            <button
+              type="button"
+              onClick={() => setErrorOpen(false)}
+              className="mt-5 w-full rounded-full bg-pomodoro px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-pomodoro-dark"
+            >
+              Entendi
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }
